@@ -1,0 +1,10 @@
+{
+  "description": "An Ayurvedic e-commerce platform offering handcrafted herbal remedies with authentic packaging and a guided shopping experience rooted in tradition.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

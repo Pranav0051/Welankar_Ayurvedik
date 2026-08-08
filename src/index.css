@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Caveat:wght@600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --color-forest: #0D2C22;
+  --color-forest-dark: #071C15;
+  --color-forest-light: #184234;
+  --color-gold: #D4AF37;
+  --color-gold-light: #F5D77F;
+  --color-gold-glow: #FFE58F;
+  --color-cream: #FDFBF7;
+  --color-cream-dark: #F3EFE6;
+  --color-parchment: #F7F3EB;
+  --color-clay: #C85A32;
+  --color-plum: #1A2421;
+
+  --font-heading: 'Fraunces', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-accent: 'Caveat', cursive;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #D4AF37 #0D2C22;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #FDFBF7;
+  color: #1A2421;
+  overflow-x: hidden;
+}
+
+/* Custom Glassmorphism */
+.glass-panel {
+  background: rgba(253, 251, 247, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.glass-dark {
+  background: rgba(13, 44, 34, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+/* Wax stamp animation */
+@keyframes stamp-in {
+  0%   { transform: scale(2.2) rotate(-18deg); opacity: 0; }
+  55%  { transform: scale(0.93) rotate(4deg);  opacity: 1; }
+  80%  { transform: scale(1.04) rotate(-2deg); }
+  100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+.stamp-enter {
+  animation: stamp-in 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Hover glow effects */
+.hover-gold-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-gold-glow:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.35);
+  border-color: #D4AF37;
+}
+
+/* Card hover animation */
+.jar-card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.jar-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px -8px rgba(13, 44, 34, 0.15);
+}
