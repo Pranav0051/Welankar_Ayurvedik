@@ -1,3 +1,12 @@
+import ashwagandhaImg from "../assets/images/ashwagandha.png";
+import haldiKesarImg from "../assets/images/haldi_kesar.png";
+import triphalaImg from "../assets/images/triphala.png";
+import brahmiOilImg from "../assets/images/brahmi_oil.png";
+import neemCapsulesImg from "../assets/images/neem_capsules.png";
+import chyawanprashImg from "../assets/images/chyawanprash.png";
+import shankhapushpiImg from "../assets/images/shankhapushpi.png";
+import trikatuImg from "../assets/images/trikatu.png";
+
 export interface Product {
   id: number;
   name: string;
@@ -47,7 +56,7 @@ export const initialProducts: Product[] = [
     price: 349,
     stock: 45,
     weight: "100g Jar",
-    image: "/images/ashwagandha.png",
+    image: ashwagandhaImg,
     rating: 4.9,
     reviewsCount: 142,
     batchNo: "AYUR-2026-ASH-09",
@@ -74,7 +83,7 @@ export const initialProducts: Product[] = [
     price: 420,
     stock: 30,
     weight: "75g Jar",
-    image: "/images/haldi_kesar.png",
+    image: haldiKesarImg,
     rating: 4.8,
     reviewsCount: 98,
     batchNo: "AYUR-2026-HK-03",
@@ -101,7 +110,7 @@ export const initialProducts: Product[] = [
     price: 285,
     stock: 8,
     weight: "120g Jar",
-    image: "/images/triphala.png",
+    image: triphalaImg,
     rating: 4.9,
     reviewsCount: 210,
     batchNo: "AYUR-2026-TRI-01",
@@ -128,7 +137,7 @@ export const initialProducts: Product[] = [
     price: 580,
     stock: 22,
     weight: "100ml Bottle",
-    image: "/images/brahmi_oil.png",
+    image: brahmiOilImg,
     rating: 4.7,
     reviewsCount: 88,
     batchNo: "AYUR-2026-BR-08",
@@ -155,7 +164,7 @@ export const initialProducts: Product[] = [
     price: 310,
     stock: 60,
     weight: "60 Veg Caps",
-    image: "/images/neem_capsules.png",
+    image: neemCapsulesImg,
     rating: 4.8,
     reviewsCount: 115,
     batchNo: "AYUR-2026-NEEM-14",
@@ -182,7 +191,7 @@ export const initialProducts: Product[] = [
     price: 890,
     stock: 18,
     weight: "500g Glass Jar",
-    image: "/images/chyawanprash.png",
+    image: chyawanprashImg,
     rating: 4.95,
     reviewsCount: 340,
     batchNo: "AYUR-2026-CHY-02",
@@ -194,7 +203,7 @@ export const initialProducts: Product[] = [
     dosage: "1 tablespoon (12g) every morning on empty stomach.",
     description: "Handcrafted in pure copper vats over 7 days following the 49-herb Charaka Samhita Rasayana protocol.",
     description_hi: "तांबे के पात्रों में 7 दिनों तक तैयार। 49 जड़ी-बूटियों और A2 गाय के घी से निर्मित दिव्य अवलेह।",
-    description_mr: "तांब्याच्या भांड्यात ७ दिवस मंद आचेवर तयार केलेला च्यवनप्राश अवलेह. ४९ वनस्पती व A2 तूप वापरून बनवलेला.",
+    description_mr: "तांब्याच्य भांड्यात ७ दिवस मंद आचेवर तयार केलेला च्यवनप्राश अवलेह. ४९ वनस्पती व A2 तूप वापरून बनवलेला.",
     longDescription: "Made exclusively during the winter harvest using wild forest Amalaki fruits rich in bio-available Vitamin C, sweetened only with raw unprocessed forest honey and churned A2 Gir cow ghee.",
     active: true,
   },
@@ -209,7 +218,7 @@ export const initialProducts: Product[] = [
     price: 390,
     stock: 35,
     weight: "200ml Bottle",
-    image: "/images/shankhapushpi.png",
+    image: shankhapushpiImg,
     rating: 4.7,
     reviewsCount: 64,
     batchNo: "AYUR-2026-SP-12",
@@ -236,7 +245,7 @@ export const initialProducts: Product[] = [
     price: 240,
     stock: 50,
     weight: "100g Jar",
-    image: "/images/trikatu.png",
+    image: trikatuImg,
     rating: 4.8,
     reviewsCount: 112,
     batchNo: "AYUR-2026-TRI-04",

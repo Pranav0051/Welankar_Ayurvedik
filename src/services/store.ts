@@ -23,7 +23,7 @@ export interface Order {
   paymentId?: string;
 }
 
-const PRODUCTS_KEY = "ayurveda_products_v6";
+const PRODUCTS_KEY = "ayurveda_products_v7";
 const KB_KEY = "ayurveda_kb_v2";
 const ORDERS_KEY = "ayurveda_orders_v2";
 const LANG_KEY = "ayurveda_lang_v2";
@@ -52,7 +52,16 @@ export function getProducts(): Product[] {
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(initialProducts));
       return initialProducts;
     }
-    return JSON.parse(raw);
+    const parsed: Product[] = JSON.parse(raw);
+    // Auto-sync image URLs with initialProducts bundled ESM assets if stored image is unbundled or invalid
+    const synced = parsed.map(p => {
+      const match = initialProducts.find(ip => ip.id === p.id);
+      if (match && (!p.image || p.image.startsWith("/images/") || p.image.includes("unsplash.com"))) {
+        return { ...p, image: match.image };
+      }
+      return p;
+    });
+    return synced;
   } catch {
     return initialProducts;
   }
