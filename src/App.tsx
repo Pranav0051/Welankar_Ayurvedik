@@ -84,7 +84,7 @@ export default function App() {
           </Routes>
         </div>
         <Footer />
-        <ChatbotWidget />
+        <ChatbotWidget onAddToCart={addItem} />
       </div>
     </BrowserRouter>
   );

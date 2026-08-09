@@ -161,7 +161,21 @@ export function getKnowledgeBase(): KnowledgeEntry[] {
       localStorage.setItem(KB_KEY, JSON.stringify(initialKnowledgeBase));
       return initialKnowledgeBase;
     }
-    return JSON.parse(raw);
+    const parsed: KnowledgeEntry[] = JSON.parse(raw);
+    // Ensure all fresh initial entries exist in stored list
+    const existingIds = new Set(parsed.map(e => e.id));
+    let updated = false;
+    const merged = [...parsed];
+    initialKnowledgeBase.forEach(initEntry => {
+      if (!existingIds.has(initEntry.id)) {
+        merged.push(initEntry);
+        updated = true;
+      }
+    });
+    if (updated) {
+      localStorage.setItem(KB_KEY, JSON.stringify(merged));
+    }
+    return merged;
   } catch {
     return initialKnowledgeBase;
   }
