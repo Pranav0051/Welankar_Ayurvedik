@@ -385,6 +385,10 @@ export default function ChatbotWidget({ onAddToCart }: ChatbotWidgetProps) {
                             <img
                               src={p.image}
                               alt={p.name}
+                              onError={e => {
+                                const fallbackKey = p.slug ? p.slug.split("-")[0] : "ashwagandha";
+                                e.currentTarget.src = `/images/${fallbackKey}.png`;
+                              }}
                               className="w-10 h-10 rounded-lg object-cover border border-[#D4AF37]/30 shrink-0"
                             />
                             <div className="min-w-0">

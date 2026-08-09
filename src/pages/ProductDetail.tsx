@@ -88,6 +88,10 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
               <img
                 src={product.image}
                 alt={displayName}
+                onError={e => {
+                  const fallbackKey = product.slug ? product.slug.split("-")[0] : "ashwagandha";
+                  e.currentTarget.src = `/images/${fallbackKey}.png`;
+                }}
                 className="w-full h-80 object-cover rounded-xl shadow-md border"
               />
               <div className="absolute bottom-4 right-4 bg-[#C85A32] text-[#FDFBF7] text-xs font-bold px-3 py-1 rounded-full shadow border border-[#D4AF37]">

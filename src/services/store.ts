@@ -53,10 +53,10 @@ export function getProducts(): Product[] {
       return initialProducts;
     }
     const parsed: Product[] = JSON.parse(raw);
-    // Auto-sync image URLs with initialProducts bundled ESM assets if stored image is unbundled or invalid
+    // Auto-sync image URLs with initialProducts bundled ESM assets
     const synced = parsed.map(p => {
       const match = initialProducts.find(ip => ip.id === p.id);
-      if (match && (!p.image || p.image.startsWith("/images/") || p.image.includes("unsplash.com"))) {
+      if (match) {
         return { ...p, image: match.image };
       }
       return p;

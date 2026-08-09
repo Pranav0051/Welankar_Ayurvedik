@@ -49,6 +49,10 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
               <img
                 src={product.image}
                 alt={displayName}
+                onError={e => {
+                  const fallbackKey = product.slug ? product.slug.split("-")[0] : "ashwagandha";
+                  e.currentTarget.src = `/images/${fallbackKey}.png`;
+                }}
                 className="w-40 h-48 object-cover rounded-xl shadow-md border"
               />
               <span className="absolute bottom-3 right-3 bg-[#C85A32] text-[#FDFBF7] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#D4AF37]">

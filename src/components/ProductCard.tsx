@@ -60,7 +60,8 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
             src={product.image}
             alt={displayName}
             onError={e => {
-              e.currentTarget.src = "https://images.unsplash.com/photo-1615485500834-bc10199bc727?w=400&h=400&fit=crop&auto=format";
+              const fallbackKey = product.slug ? product.slug.split("-")[0] : "ashwagandha";
+              e.currentTarget.src = `/images/${fallbackKey}.png`;
             }}
             className="w-full h-full object-cover filter contrast-105"
           />
