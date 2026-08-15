@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import type { Product } from "../data/products";
-import { getLanguage } from "../services/store";
-import { translations } from "../data/i18n";
+import { getLanguage, subscribeStore } from "../services/store";
+import { translations, Language } from "../data/i18n";
 
 interface ProductCardProps {
   product: Product;
@@ -10,9 +10,18 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  const [lang, setLang] = useState<Language>(getLanguage());
   const [stamped, setStamped] = useState(false);
-  const lang = getLanguage();
+
+  useEffect(() => {
+    return subscribeStore(() => {
+      setLang(getLanguage());
+    });
+  }, []);
+
   const t = translations[lang].products;
+  const tHero = translations[lang].hero;
+  const tConcerns = translations[lang].concerns;
 
   const handleAdd = () => {
     onAddToCart(product);
@@ -34,12 +43,19 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       ? product.description_mr
       : product.description;
 
+  const concernLabel =
+    (tConcerns[product.concern as keyof typeof tConcerns] as string) || product.concern;
+
   return (
     <div className="group relative bg-[#FDFBF7] border border-[#D4AF37]/30 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:border-[#D4AF37] transition-all duration-300 flex flex-col jar-card-hover">
       {/* Scalloped Wax-Seal Price Badge */}
       <div className="absolute top-3.5 right-3.5 z-10 w-14 h-14 rounded-full bg-gradient-to-br from-[#C85A32] to-[#9E3C1B] text-[#FDFBF7] flex flex-col items-center justify-center font-serif text-xs shadow-xl border-2 border-[#D4AF37] rotate-6 group-hover:rotate-0 transition-transform">
-        <span className="text-[9px] leading-tight opacity-90 tracking-wider">MRP</span>
-        <span className="font-bold text-sm tracking-tight text-[#F5D77F]">₹{product.price}</span>
+        <span className="text-[9px] leading-tight opacity-90 tracking-wider">
+          {tHero.mrp}
+        </span>
+        <span className="font-bold text-sm tracking-tight text-[#F5D77F]">
+          ₹{product.price}
+        </span>
       </div>
 
       {/* Tag Badge if present */}
@@ -50,23 +66,14 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       )}
 
       {/* Jar Container Frame */}
-      <div className="relative pt-8 pb-3 px-6 flex items-center justify-center bg-gradient-to-b from-[#F7F3EB] to-[#FDFBF7] min-h-[220px]">
-        {/* Cork Cap Graphic */}
-        <div className="absolute top-3 w-16 h-3 bg-[#8B5A2B] rounded-t border-b border-[#6E421F] shadow-sm"></div>
-
-        {/* Jar Image */}
-        <div className="relative w-36 h-44 rounded-xl overflow-hidden border-2 border-[#D4AF37]/30 shadow-md group-hover:border-[#D4AF37] group-hover:scale-105 transition-all duration-300">
+      <div className="relative pt-6 pb-3 px-4 flex items-center justify-center bg-gradient-to-b from-[#F7F3EB] to-[#FDFBF7] min-h-[220px]">
+        {/* Product Image Box */}
+        <div className="relative w-40 h-48 rounded-xl overflow-hidden border-2 border-[#D4AF37]/30 shadow-md group-hover:border-[#D4AF37] group-hover:scale-105 transition-all duration-300 bg-white flex items-center justify-center p-2">
           <img
             src={product.image}
             alt={displayName}
-            onError={e => {
-              const fallbackKey = product.slug ? product.slug.split("-")[0] : "ashwagandha";
-              e.currentTarget.src = `/images/${fallbackKey}.png`;
-            }}
-            className="w-full h-full object-cover filter contrast-105"
+            className="w-full h-full object-contain filter contrast-105"
           />
-          {/* Reflection */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/30 pointer-events-none"></div>
         </div>
       </div>
 
@@ -74,7 +81,7 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
       <div className="p-5 flex-1 flex flex-col justify-between border-t border-[#D4AF37]/20 bg-[#FDFBF7]">
         <div>
           <div className="flex items-center justify-between text-[11px] font-bold text-[#C85A32] uppercase tracking-wider mb-1">
-            <span>{product.concern}</span>
+            <span>{concernLabel}</span>
             <span className="text-[#0D2C22]/60">{product.weight}</span>
           </div>
           <Link to={`/products/${product.slug}`}>

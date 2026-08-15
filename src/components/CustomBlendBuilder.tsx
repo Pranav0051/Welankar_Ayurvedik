@@ -1,16 +1,27 @@
-import { useState } from "react";
-import { getProducts } from "../services/store";
+import { useState, useEffect } from "react";
+import { getProducts, getLanguage, subscribeStore } from "../services/store";
 import type { Product } from "../data/products";
+import { translations, Language } from "../data/i18n";
 
 interface CustomBlendBuilderProps {
   onAddToCart: (product: Product) => void;
 }
 
 export default function CustomBlendBuilder({ onAddToCart }: CustomBlendBuilderProps) {
-  const allProds = getProducts().filter(p => p.active);
+  const [lang, setLang] = useState<Language>(getLanguage());
+  const [allProds, setAllProds] = useState<Product[]>(getProducts().filter(p => p.active));
   const [selectedIds, setSelectedIds] = useState<number[]>([1, 3]);
-  const [customName, setCustomName] = useState("My Personal Rasayana Blend");
+  const [customName, setCustomName] = useState("");
   const [stamped, setStamped] = useState(false);
+
+  useEffect(() => {
+    return subscribeStore(() => {
+      setLang(getLanguage());
+      setAllProds(getProducts().filter(p => p.active));
+    });
+  }, []);
+
+  const t = translations[lang].customBlend;
 
   const toggleSelect = (id: number) => {
     if (selectedIds.includes(id)) {
@@ -30,16 +41,19 @@ export default function CustomBlendBuilder({ onAddToCart }: CustomBlendBuilderPr
   ); // 15% custom blend discount
 
   const handleAddCustom = () => {
+    const defaultName = t.defaultBlendName;
+    const finalName = customName.trim() || defaultName;
+
     const customProduct: Product = {
       id: Date.now(),
-      name: customName || "Personal Apothecary Custom Blend",
+      name: finalName,
       slug: `custom-blend-${Date.now()}`,
-      concern: selectedProds[0]?.concern || "stress",
+      concern: selectedProds[0]?.concern || "digestion",
       form: "Churna (Powder)",
       price: totalPrice,
       stock: 10,
       weight: "150g Custom Jar",
-      image: "https://images.unsplash.com/photo-1615485500834-bc10199bc727?w=400&h=400&fit=crop&auto=format",
+      image: selectedProds[0]?.image || "https://images.unsplash.com/photo-1615485500834-bc10199bc727?w=400&h=400&fit=crop&auto=format",
       rating: 5.0,
       reviewsCount: 1,
       batchNo: `CUSTOM-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -65,13 +79,13 @@ export default function CustomBlendBuilder({ onAddToCart }: CustomBlendBuilderPr
         {/* Header */}
         <div className="max-w-2xl mb-8 space-y-2">
           <span className="bg-[#D4AF37] text-[#0D2C22] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-widest inline-block">
-            🧪 Interactive Apothecary Laboratory
+            {t.badge}
           </span>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold">
-            Create Your Custom Apothecary Blend
+            {t.title}
           </h2>
           <p className="text-xs sm:text-sm text-[#FDFBF7]/80 font-sans leading-relaxed">
-            Select up to 3 classical formulations to create a personalized stone-ground jar (15% custom bundle savings applied).
+            {t.subtitle}
           </p>
         </div>
 
@@ -80,31 +94,40 @@ export default function CustomBlendBuilder({ onAddToCart }: CustomBlendBuilderPr
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {allProds.map(p => {
               const isSelected = selectedIds.includes(p.id);
+              const pName =
+                lang === "MR" && p.name_mr
+                  ? p.name_mr
+                  : lang === "HI" && p.name_hi
+                  ? p.name_hi
+                  : p.name;
+
               return (
                 <div
                   key={p.id}
                   onClick={() => toggleSelect(p.id)}
-                  className={`cursor-pointer p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between ${
+                  className={`cursor-pointer p-3.5 rounded-2xl border transition-all duration-200 flex items-center justify-between ${
                     isSelected
                       ? "bg-[#184234] border-[#D4AF37] shadow-lg text-[#FDFBF7]"
                       : "bg-[#071C15]/70 border-[#D4AF37]/20 hover:border-[#D4AF37]/50 text-[#FDFBF7]/70"
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 min-w-0 pr-2">
                     <img
                       src={p.image}
-                      alt={p.name}
-                      className="w-10 h-10 object-cover rounded-lg border border-[#D4AF37]/40"
+                      alt={pName}
+                      className="w-10 h-10 object-contain rounded-lg border border-[#D4AF37]/40 bg-white p-0.5 shrink-0"
                     />
-                    <div>
-                      <span className="font-bold text-xs block text-[#FDFBF7]">{p.name}</span>
-                      <span className="text-[10px] text-[#D4AF37] font-mono">₹{p.price} • {p.concern}</span>
+                    <div className="min-w-0">
+                      <span className="font-bold text-xs block text-[#FDFBF7] truncate">{pName}</span>
+                      <span className="text-[10px] text-[#D4AF37] font-mono">₹{p.price} • {p.weight}</span>
                     </div>
                   </div>
 
-                  <span className={`w-6 h-6 rounded-full border flex items-center justify-center font-bold text-xs ${
-                    isSelected ? "bg-[#D4AF37] text-[#0D2C22] border-[#D4AF37]" : "border-[#D4AF37]/40"
-                  }`}>
+                  <span
+                    className={`w-6 h-6 rounded-full border flex items-center justify-center font-bold text-xs shrink-0 ${
+                      isSelected ? "bg-[#D4AF37] text-[#0D2C22] border-[#D4AF37]" : "border-[#D4AF37]/40"
+                    }`}
+                  >
                     {isSelected ? "✓" : "+"}
                   </span>
                 </div>
@@ -115,38 +138,47 @@ export default function CustomBlendBuilder({ onAddToCart }: CustomBlendBuilderPr
           {/* Custom Jar Preview Box */}
           <div className="lg:col-span-4 bg-[#071C15] p-6 rounded-2xl border-2 border-[#D4AF37] space-y-4 shadow-xl">
             <h3 className="font-heading text-lg font-bold text-[#D4AF37] border-b border-[#D4AF37]/30 pb-2">
-              📦 Custom Apothecary Jar
+              {t.jarTitle}
             </h3>
 
             <div>
               <label className="block text-[11px] font-bold text-[#FDFBF7]/80 uppercase mb-1">
-                Name Your Custom Remedy:
+                {t.nameLabel}
               </label>
               <input
                 type="text"
                 value={customName}
+                placeholder={t.defaultBlendName}
                 onChange={e => setCustomName(e.target.value)}
-                className="w-full bg-[#0D2C22] text-[#FDFBF7] text-xs px-3 py-2 rounded-xl border border-[#D4AF37]/40"
+                className="w-full bg-[#0D2C22] text-[#FDFBF7] text-xs px-3 py-2 rounded-xl border border-[#D4AF37]/40 focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
 
             <div>
               <span className="block text-[11px] font-bold text-[#FDFBF7]/80 uppercase mb-1">
-                Selected Ingredients ({selectedProds.length}/3):
+                {t.selectedIngredients} ({selectedProds.length}/3):
               </span>
               <div className="space-y-1">
-                {selectedProds.map((p, i) => (
-                  <div key={i} className="text-xs bg-[#0D2C22] px-3 py-1.5 rounded-lg border border-[#D4AF37]/20 flex justify-between">
-                    <span>{p.name}</span>
-                    <span className="text-[#D4AF37] font-bold">₹{p.price}</span>
-                  </div>
-                ))}
+                {selectedProds.map((p, i) => {
+                  const pName =
+                    lang === "MR" && p.name_mr
+                      ? p.name_mr
+                      : lang === "HI" && p.name_hi
+                      ? p.name_hi
+                      : p.name;
+                  return (
+                    <div key={i} className="text-xs bg-[#0D2C22] px-3 py-1.5 rounded-lg border border-[#D4AF37]/20 flex justify-between">
+                      <span className="truncate pr-2">{pName}</span>
+                      <span className="text-[#D4AF37] font-bold shrink-0">₹{p.price}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             <div className="pt-3 border-t border-[#D4AF37]/30 flex items-center justify-between">
               <div>
-                <span className="text-[10px] text-[#FDFBF7]/60 block">Bundle Discount (15% Off)</span>
+                <span className="text-[10px] text-[#FDFBF7]/60 block">{t.discountLabel}</span>
                 <span className="font-heading text-2xl font-bold text-[#D4AF37]">₹{totalPrice}</span>
               </div>
 
@@ -154,7 +186,7 @@ export default function CustomBlendBuilder({ onAddToCart }: CustomBlendBuilderPr
                 onClick={handleAddCustom}
                 className="px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#F5D77F] text-[#0D2C22] font-bold text-xs rounded-xl hover:shadow-lg transition-all"
               >
-                {stamped ? "✔ Added Blend!" : "⚡ Add Custom Blend"}
+                {stamped ? t.addedBtn : t.addBtn}
               </button>
             </div>
           </div>

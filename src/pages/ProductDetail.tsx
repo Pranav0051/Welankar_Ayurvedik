@@ -26,22 +26,25 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
 
   const product = products.find(p => p.slug === slug);
   const t = translations[lang].products;
+  const tNav = translations[lang].nav;
+  const tHero = translations[lang].hero;
+  const tConcerns = translations[lang].concerns;
 
   if (!product) {
     return (
       <div className="min-h-screen bg-[#FDFBF7] py-20 px-4 text-center">
         <span className="text-6xl block mb-4">📜</span>
         <h2 className="font-heading text-2xl font-bold text-[#0D2C22]">
-          Product Not Found
+          {t.noProductsFound}
         </h2>
         <p className="text-sm text-[#1A2421]/70 mt-1 mb-6">
-          The requested Ayurvedic formulation could not be located in our apothecary archives.
+          {t.noProductsSubtitle}
         </p>
         <button
           onClick={() => navigate("/products")}
           className="px-6 py-2.5 bg-[#0D2C22] text-[#D4AF37] rounded-xl font-bold text-sm"
         >
-          Return to Catalog
+          {t.viewAllCatalog}
         </button>
       </div>
     );
@@ -61,6 +64,9 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
       ? product.description_mr
       : product.description;
 
+  const concernLabel =
+    (tConcerns[product.concern as keyof typeof tConcerns] as string) || product.concern;
+
   const handleAdd = () => {
     onAddToCart(product, qty);
     setStamped(true);
@@ -72,27 +78,22 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
       <div className="max-w-6xl mx-auto">
         {/* Breadcrumb */}
         <nav className="text-xs font-semibold text-[#C85A32] mb-6 flex items-center space-x-2">
-          <Link to="/" className="hover:underline">Home</Link>
+          <Link to="/" className="hover:underline">{tNav.home}</Link>
           <span>/</span>
-          <Link to="/products" className="hover:underline">Products</Link>
+          <Link to="/products" className="hover:underline">{tNav.products}</Link>
           <span>/</span>
           <span className="text-[#0D2C22]">{displayName}</span>
         </nav>
 
         {/* Detail Card */}
         <div className="bg-[#F7F3EB] border border-[#D4AF37]/30 rounded-3xl p-6 sm:p-10 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Jar Image Column */}
+          {/* Product Image Column */}
           <div className="lg:col-span-5 flex flex-col items-center">
-            <div className="relative w-full max-w-sm h-96 bg-[#FDFBF7] rounded-2xl border-2 border-[#D4AF37]/40 p-6 shadow-inner flex flex-col items-center justify-center">
-              <div className="absolute top-2 w-20 h-4 bg-[#8B5A2B] rounded-t-sm shadow"></div>
+            <div className="relative w-full max-w-sm h-96 bg-white rounded-2xl border-2 border-[#D4AF37]/40 p-4 shadow-inner flex flex-col items-center justify-center">
               <img
                 src={product.image}
                 alt={displayName}
-                onError={e => {
-                  const fallbackKey = product.slug ? product.slug.split("-")[0] : "ashwagandha";
-                  e.currentTarget.src = `/images/${fallbackKey}.png`;
-                }}
-                className="w-full h-80 object-cover rounded-xl shadow-md border"
+                className="w-full h-80 object-contain rounded-xl"
               />
               <div className="absolute bottom-4 right-4 bg-[#C85A32] text-[#FDFBF7] text-xs font-bold px-3 py-1 rounded-full shadow border border-[#D4AF37]">
                 {product.weight}
@@ -100,7 +101,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             </div>
 
             <div className="mt-3 text-xs text-[#0D2C22]/70 font-mono text-center">
-              Batch Cert No: <strong className="text-[#C85A32]">{product.batchNo || "AYUR-2026-CERT"}</strong>
+              {t.batchCertNo} <strong className="text-[#C85A32]">{product.batchNo || "VEL-2026-CERT"}</strong>
             </div>
           </div>
 
@@ -109,7 +110,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             <div>
               <div className="flex items-center space-x-3 mb-2">
                 <span className="bg-[#0D2C22] text-[#D4AF37] text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full">
-                  {product.concern}
+                  {concernLabel}
                 </span>
                 {product.tag && (
                   <span className="bg-[#C85A32] text-[#FDFBF7] text-xs font-bold px-2.5 py-0.5 rounded-full">
@@ -117,7 +118,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                   </span>
                 )}
                 <span className="text-xs text-[#D4AF37] font-bold">
-                  ★ {product.rating || 4.9} ({product.reviewsCount || 84} reviews)
+                  ★ {product.rating || 4.9} ({product.reviewsCount || 84} {t.reviews})
                 </span>
               </div>
 
@@ -132,7 +133,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             {/* Price & Stock */}
             <div className="flex items-center space-x-6 pb-4 border-b border-[#D4AF37]/20">
               <div>
-                <span className="text-xs text-[#1A2421]/60 block">M.R.P. (Inclusive of all taxes)</span>
+                <span className="text-xs text-[#1A2421]/60 block">{tHero.mrp}</span>
                 <span className="font-heading text-3xl font-bold text-[#0D2C22]">
                   ₹{product.price}
                 </span>
@@ -141,12 +142,12 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                 {product.stock > 0 ? (
                   <span className="text-xs font-bold text-[#0D2C22] flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                    In Stock ({product.stock} units available)
+                    {t.inStock} ({product.stock})
                   </span>
                 ) : (
                   <span className="text-xs font-bold text-red-700 flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                    Currently Out of Stock
+                    {t.outOfStock}
                   </span>
                 )}
               </div>
@@ -154,7 +155,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
 
             {/* Dosha Effect Badges */}
             <div className="bg-[#FDFBF7] p-3 rounded-xl border border-[#D4AF37]/30 flex items-center justify-between text-xs font-semibold">
-              <span className="text-[#0D2C22] font-bold">Tridosha Effect:</span>
+              <span className="text-[#0D2C22] font-bold">{t.doshaImpact}:</span>
               <div className="flex space-x-2 text-[11px]">
                 <span className="px-2.5 py-0.5 rounded bg-[#0D2C22] text-[#D4AF37]">
                   Vata: {product.doshaEffect?.vata || "Pacifies"}
@@ -168,47 +169,38 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
               </div>
             </div>
 
-            {/* Descriptions */}
-            <p className="text-sm text-[#1A2421] leading-relaxed">
-              {displayDesc}
-            </p>
-            <p className="text-xs text-[#1A2421]/80 leading-relaxed font-sans italic bg-[#FDFBF7] p-4 rounded-xl border border-[#D4AF37]/30">
-              {product.longDescription}
-            </p>
-
-            {/* Key Ingredients */}
-            <div>
-              <h4 className="font-heading text-xs font-bold text-[#0D2C22] uppercase tracking-wider mb-2">
-                🌿 {t.ingredients}
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {product.ingredients.map((ing, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-[#FDFBF7] text-[#0D2C22] text-xs font-semibold px-3 py-1 rounded-full border border-[#D4AF37]/30"
-                  >
-                    {ing}
-                  </span>
-                ))}
-              </div>
+            {/* Description Text */}
+            <div className="text-xs text-[#1A2421]/90 leading-relaxed font-sans">
+              <p>{displayDesc}</p>
             </div>
 
-            {/* Anupana & Dosage */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div className="bg-[#FDFBF7] p-4 rounded-xl border border-[#D4AF37]/30">
-                <h4 className="font-heading text-xs font-bold text-[#0D2C22] uppercase mb-1">
-                  🥣 Intake Vehicle (Anupana)
-                </h4>
-                <p className="text-xs text-[#1A2421] leading-normal">
-                  {product.anupana || "Warm milk or water after meals"}
-                </p>
+            {/* Ingredients & Intake Instructions */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="bg-[#FDFBF7] p-4 rounded-xl border border-[#D4AF37]/20">
+                <span className="font-bold text-[#0D2C22] block mb-1">
+                  🌿 {t.ingredients}
+                </span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {product.ingredients.map((ing, i) => (
+                    <span
+                      key={i}
+                      className="bg-[#0D2C22]/10 text-[#0D2C22] px-2 py-0.5 rounded-full text-[11px]"
+                    >
+                      {ing}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="bg-[#FDFBF7] p-4 rounded-xl border border-[#D4AF37]/30">
-                <h4 className="font-heading text-xs font-bold text-[#0D2C22] uppercase mb-1">
-                  📋 {t.dosage}
-                </h4>
-                <p className="text-xs text-[#1A2421] leading-normal">
-                  {product.dosage}
+
+              <div className="bg-[#FDFBF7] p-4 rounded-xl border border-[#D4AF37]/20">
+                <span className="font-bold text-[#0D2C22] block mb-1">
+                  🥣 {t.intakeVehicle} & {t.dosage}
+                </span>
+                <p className="text-[11px] text-[#1A2421]/80">
+                  <strong>{t.intakeVehicle}:</strong> {product.anupana || "Warm water or milk"}
+                </p>
+                <p className="text-[11px] text-[#1A2421]/80 mt-1">
+                  <strong>{t.dosage}:</strong> {product.dosage}
                 </p>
               </div>
             </div>
@@ -242,12 +234,25 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
               >
                 {stamped ? (
                   <span className="stamp-enter text-[#D4AF37] text-base">
-                    ✔ Added to Cart!
+                    ✔ {t.added}
                   </span>
                 ) : (
-                  <span>🛒 Add {displayName} (₹{product.price * qty})</span>
+                  <span>🛒 {t.addToCart} (₹{product.price * qty})</span>
                 )}
               </button>
+            </div>
+
+            {/* Direct Doctor WhatsApp Inquiry */}
+            <div className="pt-2">
+              <a
+                href={`https://wa.me/919075042727?text=Hello%20Dr.%20Velankar,%20I%20have%20a%20question%20about%20${encodeURIComponent(displayName)}.`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-2.5 px-4 bg-[#184234] hover:bg-[#0D2C22] text-[#D4AF37] rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-[#D4AF37]/30 transition-all shadow-sm"
+              >
+                <span>💬</span>
+                <span>{t.askDoctorWhatsApp}</span>
+              </a>
             </div>
           </div>
         </div>

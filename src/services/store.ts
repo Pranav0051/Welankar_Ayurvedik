@@ -23,8 +23,8 @@ export interface Order {
   paymentId?: string;
 }
 
-const PRODUCTS_KEY = "ayurveda_products_v7";
-const KB_KEY = "ayurveda_kb_v2";
+const PRODUCTS_KEY = "ayurveda_products_v8";
+const KB_KEY = "ayurveda_kb_v3";
 const ORDERS_KEY = "ayurveda_orders_v2";
 const LANG_KEY = "ayurveda_lang_v2";
 const AUTH_KEY = "ayurveda_admin_auth_v2";

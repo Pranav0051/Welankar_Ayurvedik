@@ -41,6 +41,7 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
   }, [searchParams]);
 
   const t = translations[lang].products;
+  const tConcerns = translations[lang].concerns;
 
   const filteredProducts = useMemo(() => {
     let result = products.filter(p => {
@@ -48,7 +49,8 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
       const matchesConcern =
         selectedConcern === "all" || p.concern === selectedConcern;
       const matchesForm =
-        selectedForm === "all" || (p.form && p.form.toLowerCase().includes(selectedForm.toLowerCase()));
+        selectedForm === "all" ||
+        (p.form && p.form.toLowerCase().includes(selectedForm.toLowerCase()));
       const matchesSearch =
         !searchQuery ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,16 +81,29 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
     });
   };
 
+  const concernOptions = [
+    { id: "all", label: t.allConcerns },
+    { id: "digestion", label: tConcerns.digestion },
+    { id: "respiratory", label: tConcerns.respiratory },
+    { id: "immunity", label: tConcerns.immunity },
+    { id: "kidney", label: tConcerns.kidney },
+    { id: "joints", label: tConcerns.joints },
+    { id: "headache", label: tConcerns.headache },
+    { id: "hair", label: tConcerns.hair },
+    { id: "diabetes", label: tConcerns.diabetes },
+    { id: "skin", label: tConcerns.skin },
+  ];
+
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header Title */}
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h1 className="font-heading text-4xl sm:text-5xl font-bold text-[#0D2C22]">
-            Classical Apothecary Catalog
+            {t.featuredTitle}
           </h1>
           <p className="text-sm text-[#1A2421]/75 font-sans mt-2">
-            Authentic Ayurvedic formulations, stone-ground powders & medicated oils
+            {t.featuredSubtitle}
           </p>
         </div>
 
@@ -104,7 +119,7 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search herbs, formulations..."
+                placeholder={t.searchProducts}
                 className="w-full bg-[#FDFBF7] border border-[#D4AF37]/40 rounded-xl px-3.5 py-2 text-xs text-[#1A2421] focus:outline-none focus:border-[#D4AF37]"
               />
             </div>
@@ -115,14 +130,7 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
                 {t.filterByConcern}
               </label>
               <div className="flex flex-wrap gap-1.5">
-                {[
-                  { id: "all", label: t.allConcerns },
-                  { id: "stress", label: "Stress" },
-                  { id: "digestion", label: "Digestion" },
-                  { id: "immunity", label: "Immunity" },
-                  { id: "skin", label: "Skin" },
-                  { id: "sleep", label: "Sleep" },
-                ].map(c => (
+                {concernOptions.map(c => (
                   <button
                     key={c.id}
                     onClick={() => handleConcernChange(c.id)}
@@ -148,7 +156,7 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
                 type="range"
                 min="100"
                 max="1200"
-                step="50"
+                step="25"
                 value={maxPrice}
                 onChange={e => setMaxPrice(Number(e.target.value))}
                 className="w-full accent-[#0D2C22] cursor-pointer"
@@ -158,34 +166,36 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
 
           {/* Form & Sort Row */}
           <div className="flex flex-wrap items-center justify-between pt-3 border-t border-[#D4AF37]/20 text-xs">
-            <div className="flex items-center space-x-2">
-              <span className="font-bold text-[#0D2C22]">Formulation Type:</span>
-              {(["all", "Churna", "Taila", "Avaleha", "Vati"] as string[]).map(f => (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="font-bold text-[#0D2C22] mr-1">
+                {t.formulationType}
+              </span>
+              {(["all", "Vati", "Svarasa", "Taila", "Gel", "Shampoo", "Churna"] as string[]).map(f => (
                 <button
                   key={f}
                   onClick={() => setSelectedForm(f)}
                   className={`px-2.5 py-0.5 rounded text-[11px] font-semibold transition-all ${
                     selectedForm === f
-                      ? "bg-[#D4AF37] text-[#0D2C22] font-bold"
+                      ? "bg-[#D4AF37] text-[#0D2C22] font-bold shadow"
                       : "text-[#1A2421]/70 hover:text-[#0D2C22]"
                   }`}
                 >
-                  {f === "all" ? "All Forms" : f}
+                  {f === "all" ? t.allForms : f}
                 </button>
               ))}
             </div>
 
             <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-              <span className="font-bold text-[#0D2C22]">Sort By:</span>
+              <span className="font-bold text-[#0D2C22]">{t.sortBy}</span>
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value)}
                 className="bg-[#FDFBF7] border border-[#D4AF37]/40 rounded-lg px-2 py-1 font-bold text-xs text-[#0D2C22]"
               >
-                <option value="bestselling">Bestselling</option>
-                <option value="rating">Top Rated (★)</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
+                <option value="bestselling">{t.sortBestselling}</option>
+                <option value="rating">{t.sortTopRated}</option>
+                <option value="price-low">{t.sortPriceLow}</option>
+                <option value="price-high">{t.sortPriceHigh}</option>
               </select>
             </div>
           </div>
@@ -196,10 +206,10 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
           <div className="text-center py-20 bg-[#F7F3EB] rounded-2xl border-2 border-dashed border-[#D4AF37]/30">
             <span className="text-5xl block mb-3">🌿</span>
             <h3 className="font-heading text-xl font-bold text-[#0D2C22]">
-              No Ayurvedic Remedies Found
+              {t.noProductsFound}
             </h3>
             <p className="text-sm text-[#1A2421]/70 mt-1">
-              Try adjusting your search terms or price filter constraints.
+              {t.noProductsSubtitle}
             </p>
             <button
               onClick={() => {
@@ -210,7 +220,7 @@ export default function ProductListing({ onAddToCart }: ProductListingProps) {
               }}
               className="mt-4 px-5 py-2.5 bg-[#0D2C22] text-[#D4AF37] rounded-xl text-xs font-bold shadow"
             >
-              Reset Filters
+              {t.resetFilters}
             </button>
           </div>
         ) : (

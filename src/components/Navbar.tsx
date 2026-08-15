@@ -51,7 +51,7 @@ export default function Navbar({ cartItems }: NavbarProps) {
               Welankar Ayurvedik
             </span>
             <span className="font-accent text-xs text-[#D4AF37] tracking-widest block mt-0.5">
-              AYUSH Certified Classical Apothecary
+              {t.subtitle}
             </span>
           </div>
         </Link>
@@ -113,7 +113,7 @@ export default function Navbar({ cartItems }: NavbarProps) {
                 : "bg-[#071C15] text-[#FDFBF7] border-[#D4AF37]/30 hover:border-[#D4AF37] hover:text-[#D4AF37]"
             }`}
           >
-            <span>{isAdmin ? "⚙️ Dashboard" : "🔐 Admin Login"}</span>
+            <span>{isAdmin ? t.adminDashboard : t.adminLogin}</span>
           </Link>
 
           {/* Cart Button */}

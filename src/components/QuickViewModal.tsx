@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Product } from "../data/products";
-import { getLanguage } from "../services/store";
-import { translations } from "../data/i18n";
+import { getLanguage, subscribeStore } from "../services/store";
+import { translations, Language } from "../data/i18n";
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -10,13 +10,20 @@ interface QuickViewModalProps {
 }
 
 export default function QuickViewModal({ product, onClose, onAddToCart }: QuickViewModalProps) {
+  const [lang, setLang] = useState<Language>(getLanguage());
   const [activeTab, setActiveTab] = useState<"overview" | "ingredients" | "dosha" | "anupana">("overview");
   const [qty, setQty] = useState(1);
   const [stamped, setStamped] = useState(false);
-  const lang = getLanguage();
-  const t = translations[lang].products;
+
+  useEffect(() => {
+    return subscribeStore(() => {
+      setLang(getLanguage());
+    });
+  }, []);
 
   if (!product) return null;
+
+  const t = translations[lang];
 
   const handleAdd = () => {
     onAddToCart(product, qty);
@@ -25,11 +32,18 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
   };
 
   const displayName =
-    lang === "HI" && product.name_hi
-      ? product.name_hi
-      : lang === "MR" && product.name_mr
+    lang === "MR" && product.name_mr
       ? product.name_mr
+      : lang === "HI" && product.name_hi
+      ? product.name_hi
       : product.name;
+
+  const displayDesc =
+    lang === "MR" && product.description_mr
+      ? product.description_mr
+      : lang === "HI" && product.description_hi
+      ? product.description_hi
+      : product.description;
 
   return (
     <div className="fixed inset-0 z-50 bg-[#071C15]/75 backdrop-blur-md flex items-center justify-center p-4">
@@ -42,18 +56,13 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
         </button>
 
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
-          {/* Product Jar Frame */}
+          {/* Product Image Frame */}
           <div className="sm:col-span-5 flex flex-col items-center">
-            <div className="relative w-full h-64 bg-[#F7F3EB] rounded-2xl border-2 border-[#D4AF37]/40 p-4 flex flex-col items-center justify-center shadow-inner">
-              <div className="absolute top-2 w-16 h-3 bg-[#8B5A2B] rounded-t shadow"></div>
+            <div className="relative w-full h-64 bg-white rounded-2xl border-2 border-[#D4AF37]/40 p-3 flex flex-col items-center justify-center shadow-inner">
               <img
                 src={product.image}
                 alt={displayName}
-                onError={e => {
-                  const fallbackKey = product.slug ? product.slug.split("-")[0] : "ashwagandha";
-                  e.currentTarget.src = `/images/${fallbackKey}.png`;
-                }}
-                className="w-40 h-48 object-cover rounded-xl shadow-md border"
+                className="w-full h-full object-contain rounded-xl"
               />
               <span className="absolute bottom-3 right-3 bg-[#C85A32] text-[#FDFBF7] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#D4AF37]">
                 {product.weight}
@@ -61,7 +70,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
             </div>
 
             <div className="mt-3 text-[10px] text-[#0D2C22]/70 font-mono text-center">
-              Batch Cert: <strong className="text-[#C85A32]">{product.batchNo}</strong>
+              {t.products.batchCertNo} <strong className="text-[#C85A32]">{product.batchNo}</strong>
             </div>
           </div>
 
@@ -72,7 +81,9 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
                 <span className="bg-[#0D2C22] text-[#D4AF37] text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
                   {product.concern}
                 </span>
-                <span className="text-xs text-[#D4AF37] font-bold">★ {product.rating} ({product.reviewsCount} reviews)</span>
+                <span className="text-xs text-[#D4AF37] font-bold">
+                  ★ {product.rating} ({product.reviewsCount} {t.products.reviews})
+                </span>
               </div>
               <h3 className="font-heading text-2xl font-bold text-[#0D2C22]">
                 {displayName}
@@ -92,7 +103,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
                     : "text-[#1A2421]/60 hover:text-[#0D2C22]"
                 }`}
               >
-                Overview
+                {t.quickView.overviewTab}
               </button>
               <button
                 onClick={() => setActiveTab("ingredients")}
@@ -102,7 +113,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
                     : "text-[#1A2421]/60 hover:text-[#0D2C22]"
                 }`}
               >
-                Ingredients
+                {t.quickView.ingredientsTab}
               </button>
               <button
                 onClick={() => setActiveTab("dosha")}
@@ -112,7 +123,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
                     : "text-[#1A2421]/60 hover:text-[#0D2C22]"
                 }`}
               >
-                Dosha Balance
+                {t.quickView.doshaTab}
               </button>
               <button
                 onClick={() => setActiveTab("anupana")}
@@ -122,16 +133,18 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
                     : "text-[#1A2421]/60 hover:text-[#0D2C22]"
                 }`}
               >
-                Anupana (Intake)
+                {t.quickView.anupanaTab}
               </button>
             </div>
 
             {/* Tab Body */}
             <div className="min-h-[100px] text-xs leading-relaxed text-[#1A2421]/90 font-sans bg-[#F7F3EB] p-3.5 rounded-xl border border-[#D4AF37]/20">
-              {activeTab === "overview" && <p>{product.description}</p>}
+              {activeTab === "overview" && <p>{displayDesc}</p>}
               {activeTab === "ingredients" && (
                 <div className="space-y-1">
-                  <span className="font-bold text-[#0D2C22] block">Botanical Synergists:</span>
+                  <span className="font-bold text-[#0D2C22] block">
+                    🌿 {t.products.ingredients}:
+                  </span>
                   <ul className="list-disc pl-4 space-y-0.5">
                     {product.ingredients.map((ing, i) => (
                       <li key={i}>{ing}</li>
@@ -142,23 +155,33 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
               {activeTab === "dosha" && (
                 <div className="space-y-1.5">
                   <div className="flex justify-between">
-                    <span>Vata Dosha:</span>
+                    <span>Vata:</span>
                     <strong className="text-[#0D2C22]">{product.doshaEffect?.vata || "Pacifies"}</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Pitta Dosha:</span>
+                    <span>Pitta:</span>
                     <strong className="text-[#0D2C22]">{product.doshaEffect?.pitta || "Neutral"}</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Kapha Dosha:</span>
+                    <span>Kapha:</span>
                     <strong className="text-[#0D2C22]">{product.doshaEffect?.kapha || "Pacifies"}</strong>
                   </div>
                 </div>
               )}
               {activeTab === "anupana" && (
-                <div>
-                  <span className="font-bold text-[#0D2C22] block">Recommended Vehicle (Anupana):</span>
-                  <p>{product.anupana}</p>
+                <div className="space-y-2">
+                  <div>
+                    <span className="font-bold text-[#0D2C22] block">
+                      🥣 {t.products.intakeVehicle}:
+                    </span>
+                    <p>{product.anupana || "Warm water or milk"}</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#0D2C22] block">
+                      📋 {t.quickView.dosageLabel}
+                    </span>
+                    <p>{product.dosage}</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -166,7 +189,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
             {/* Price & Add to Cart Controls */}
             <div className="pt-2 flex items-center justify-between">
               <div>
-                <span className="text-[10px] text-[#1A2421]/60 block">MRP</span>
+                <span className="text-[10px] text-[#1A2421]/60 block">{t.hero.mrp}</span>
                 <span className="font-heading text-2xl font-bold text-[#0D2C22]">₹{product.price}</span>
               </div>
 
@@ -189,9 +212,9 @@ export default function QuickViewModal({ product, onClose, onAddToCart }: QuickV
 
                 <button
                   onClick={handleAdd}
-                  className="px-5 py-2.5 bg-[#0D2C22] text-[#D4AF37] rounded-xl font-bold text-xs hover:bg-[#184234] shadow-md transition-all active:scale-95"
+                  className="px-5 py-2.5 bg-[#0D2C22] text-[#D4AF37] hover:bg-[#184234] font-bold text-xs rounded-xl shadow transition-all border border-[#D4AF37]/40"
                 >
-                  {stamped ? "✔ Added to Cart!" : `🛒 Add to Cart (₹${product.price * qty})`}
+                  {stamped ? t.products.added : `🛒 ${t.products.addToCart}`}
                 </button>
               </div>
             </div>

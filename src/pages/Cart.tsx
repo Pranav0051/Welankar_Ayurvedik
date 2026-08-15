@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { CartItem } from "../data/products";
 import LeafDivider from "../components/LeafDivider";
-import { createOrder, getLanguage } from "../services/store";
+import { createOrder, getLanguage, subscribeStore } from "../services/store";
 import { translations, Language } from "../data/i18n";
 
 interface CartProps {
@@ -25,6 +25,12 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [razorpayKey, setRazorpayKey] = useState("");
+
+  useEffect(() => {
+    return subscribeStore(() => {
+      setLangState(getLanguage());
+    });
+  }, []);
 
   const t = translations[lang].cart;
 
@@ -68,36 +74,36 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
 
   if (completedOrder) {
     return (
-      <div className="min-h-screen bg-[#EFE6D0] py-16 px-4">
-        <div className="max-w-2xl mx-auto bg-[#F4ECDC] border-4 border-[#2C4A3B] p-8 sm:p-10 rounded-2xl shadow-2xl text-center">
-          <div className="w-20 h-20 bg-[#2C4A3B] text-[#D9A404] rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-2 border-[#D9A404]">
+      <div className="min-h-screen bg-[#FDFBF7] py-16 px-4">
+        <div className="max-w-2xl mx-auto bg-[#F7F3EB] border-4 border-[#0D2C22] p-8 sm:p-10 rounded-3xl shadow-2xl text-center">
+          <div className="w-20 h-20 bg-[#0D2C22] text-[#D4AF37] rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-2 border-[#D4AF37]">
             ✓
           </div>
-          <span className="bg-[#D9A404] text-[#2C4A3B] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
-            AYUSH Certified Order Confirmed
+          <span className="bg-[#D4AF37] text-[#0D2C22] text-xs font-bold px-3.5 py-1 rounded-full uppercase tracking-wider">
+            {t.orderConfirmedBadge}
           </span>
-          <h1 className="font-heading text-3xl font-bold text-[#2C4A3B] mt-3">
+          <h1 className="font-heading text-3xl font-bold text-[#0D2C22] mt-3">
             {t.orderSuccess}
           </h1>
-          <p className="text-xs text-[#3F2A3D]/80 mt-1 font-mono">
-            Order Reference ID: <strong className="text-[#A85C32]">{completedOrder.id}</strong>
+          <p className="text-xs text-[#1A2421]/80 mt-1 font-mono">
+            {t.orderRefId} <strong className="text-[#C85A32]">{completedOrder.id}</strong>
           </p>
-          <p className="text-xs text-[#3F2A3D]/80 font-mono mt-0.5">
-            Payment ID: {completedOrder.paymentId}
+          <p className="text-xs text-[#1A2421]/80 font-mono mt-0.5">
+            {t.paymentRefId} {completedOrder.paymentId}
           </p>
 
-          <div className="my-6 bg-[#FFFDF9] p-5 rounded-xl border border-[#DDD0B5] text-left text-xs space-y-2">
-            <div className="flex justify-between border-b border-[#DDD0B5] pb-2">
-              <span className="font-bold text-[#2C4A3B]">Customer:</span>
+          <div className="my-6 bg-white p-5 rounded-2xl border border-[#D4AF37]/30 text-left text-xs space-y-2">
+            <div className="flex justify-between border-b border-[#D4AF37]/20 pb-2">
+              <span className="font-bold text-[#0D2C22]">{t.customerLabel}</span>
               <span>{completedOrder.customerName} ({completedOrder.email})</span>
             </div>
-            <div className="flex justify-between border-b border-[#DDD0B5] pb-2">
-              <span className="font-bold text-[#2C4A3B]">Delivery Address:</span>
+            <div className="flex justify-between border-b border-[#D4AF37]/20 pb-2">
+              <span className="font-bold text-[#0D2C22]">{t.deliveryAddressLabel}</span>
               <span>{completedOrder.address}</span>
             </div>
-            <div className="flex justify-between font-bold text-sm text-[#2C4A3B] pt-1">
-              <span>Amount Paid via Razorpay:</span>
-              <span>₹{completedOrder.total}</span>
+            <div className="flex justify-between font-bold text-sm text-[#0D2C22] pt-1">
+              <span>{t.amountPaidLabel}</span>
+              <span className="text-[#C85A32]">₹{completedOrder.total}</span>
             </div>
           </div>
 
@@ -108,15 +114,9 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
                 setIsCheckoutOpen(false);
                 navigate("/products");
               }}
-              className="px-6 py-3 bg-[#2C4A3B] text-[#EFE6D0] rounded-xl font-bold text-sm hover:bg-[#1b2d23] shadow"
+              className="px-6 py-3 bg-[#0D2C22] text-[#D4AF37] rounded-xl font-bold text-sm hover:bg-[#184234] shadow"
             >
-              Continue Shopping
-            </button>
-            <button
-              onClick={() => navigate("/admin")}
-              className="px-6 py-3 bg-[#D9A404] text-[#2C4A3B] rounded-xl font-bold text-sm hover:bg-[#edb508] shadow"
-            >
-              View in Admin Dashboard
+              {t.returnToShopBtn}
             </button>
           </div>
         </div>
@@ -125,108 +125,114 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
   }
 
   return (
-    <div className="min-h-screen bg-[#EFE6D0] py-12 px-4">
+    <div className="min-h-screen bg-[#FDFBF7] py-12 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="font-heading text-3xl sm:text-4xl font-bold text-[#2C4A3B] mb-8">
+        <h1 className="font-heading text-3xl sm:text-4xl font-bold text-[#0D2C22] mb-8">
           {t.title}
         </h1>
 
         {items.length === 0 ? (
-          <div className="text-center py-20 bg-[#F4ECDC] rounded-2xl border-2 border-dashed border-[#DDD0B5]">
+          <div className="text-center py-20 bg-[#F7F3EB] rounded-3xl border-2 border-dashed border-[#D4AF37]/40">
             <span className="text-6xl block mb-3">🛒</span>
-            <h3 className="font-heading text-2xl font-bold text-[#2C4A3B]">
+            <h3 className="font-heading text-2xl font-bold text-[#0D2C22]">
               {t.empty}
             </h3>
-            <p className="text-sm text-[#3F2A3D]/70 mt-1 mb-6">
-              Browse our heritage products to add authentic formulations to your cart.
-            </p>
             <Link
               to="/products"
-              className="px-6 py-3 bg-[#2C4A3B] text-[#EFE6D0] rounded-xl font-bold text-sm hover:bg-[#1b2d23]"
+              className="mt-6 inline-block px-6 py-3 bg-[#0D2C22] text-[#D4AF37] rounded-xl font-bold text-sm hover:bg-[#184234] shadow"
             >
-              Explore Products
+              {t.exploreBtn}
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Cart Items List */}
             <div className="lg:col-span-8 space-y-4">
-              {items.map(item => (
-                <div
-                  key={item.product.id}
-                  className="bg-[#F4ECDC] border-2 border-[#DDD0B5] rounded-xl p-4 sm:p-5 flex items-center justify-between shadow-sm"
-                >
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={item.product.image}
-                      alt={item.product.name}
-                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-[#DDD0B5]"
-                    />
-                    <div>
-                      <h3 className="font-heading font-bold text-[#2C4A3B] text-base">
-                        {item.product.name}
-                      </h3>
-                      <p className="text-xs text-[#3F2A3D]/70">
-                        {item.product.weight} • ₹{item.product.price} per unit
-                      </p>
-                      <button
-                        onClick={() => onRemove(item.product.id)}
-                        className="text-xs text-red-700 hover:underline mt-1 block"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
+              {items.map(item => {
+                const displayName =
+                  lang === "HI" && item.product.name_hi
+                    ? item.product.name_hi
+                    : lang === "MR" && item.product.name_mr
+                    ? item.product.name_mr
+                    : item.product.name;
 
-                  <div className="flex items-center space-x-4">
-                    {/* Quantity Selector */}
-                    <div className="flex items-center space-x-2 bg-[#EFE6D0] border border-[#DDD0B5] rounded-lg px-2 py-1">
-                      <button
-                        onClick={() => onUpdateQty(item.product.id, item.qty - 1)}
-                        className="w-6 h-6 rounded bg-[#2C4A3B] text-[#EFE6D0] font-bold text-xs flex items-center justify-center hover:bg-[#1b2d23]"
-                      >
-                        -
-                      </button>
-                      <span className="w-6 text-center font-bold text-sm text-[#2C4A3B]">
-                        {item.qty}
-                      </span>
-                      <button
-                        onClick={() => onUpdateQty(item.product.id, item.qty + 1)}
-                        className="w-6 h-6 rounded bg-[#2C4A3B] text-[#EFE6D0] font-bold text-xs flex items-center justify-center hover:bg-[#1b2d23]"
-                      >
-                        +
-                      </button>
+                return (
+                  <div
+                    key={item.product.id}
+                    className="bg-[#F7F3EB] border border-[#D4AF37]/30 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-sm"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <img
+                        src={item.product.image}
+                        alt={displayName}
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-xl border border-[#D4AF37]/30 bg-white p-1"
+                      />
+                      <div>
+                        <h3 className="font-heading font-bold text-[#0D2C22] text-base">
+                          {displayName}
+                        </h3>
+                        <p className="text-xs text-[#1A2421]/70">
+                          {item.product.weight} • ₹{item.product.price}
+                        </p>
+                        <button
+                          onClick={() => onRemove(item.product.id)}
+                          className="text-xs text-[#C85A32] hover:underline mt-1 block font-bold"
+                        >
+                          ✕ Remove
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="text-right min-w-[70px]">
-                      <span className="font-heading font-bold text-lg text-[#2C4A3B]">
-                        ₹{item.product.price * item.qty}
-                      </span>
+                    <div className="flex items-center space-x-4">
+                      {/* Quantity Selector */}
+                      <div className="flex items-center space-x-2 bg-[#FDFBF7] border border-[#D4AF37]/40 rounded-xl px-2 py-1">
+                        <button
+                          onClick={() => onUpdateQty(item.product.id, item.qty - 1)}
+                          className="w-6 h-6 rounded bg-[#0D2C22] text-[#FDFBF7] font-bold text-xs flex items-center justify-center"
+                        >
+                          -
+                        </button>
+                        <span className="w-6 text-center font-bold text-sm text-[#0D2C22]">
+                          {item.qty}
+                        </span>
+                        <button
+                          onClick={() => onUpdateQty(item.product.id, item.qty + 1)}
+                          className="w-6 h-6 rounded bg-[#0D2C22] text-[#FDFBF7] font-bold text-xs flex items-center justify-center"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <div className="text-right min-w-[70px]">
+                        <span className="font-heading font-bold text-lg text-[#0D2C22]">
+                          ₹{item.product.price * item.qty}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Order Summary & Checkout Trigger */}
             <div className="lg:col-span-4">
-              <div className="bg-[#F4ECDC] border-2 border-[#DDD0B5] rounded-xl p-6 shadow-md sticky top-24">
-                <h3 className="font-heading text-xl font-bold text-[#2C4A3B] pb-3 border-b border-[#DDD0B5]">
-                  Order Summary
+              <div className="bg-[#F7F3EB] border border-[#D4AF37]/40 rounded-2xl p-6 shadow-md sticky top-24">
+                <h3 className="font-heading text-xl font-bold text-[#0D2C22] pb-3 border-b border-[#D4AF37]/30">
+                  {t.title}
                 </h3>
 
-                <div className="py-4 space-y-3 text-sm text-[#3F2A3D]">
+                <div className="py-4 space-y-3 text-sm text-[#1A2421]">
                   <div className="flex justify-between">
                     <span>{t.subtotal}</span>
                     <span className="font-bold">₹{subtotal}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span>{t.shipping}</span>
-                    <span className="font-bold text-[#2C4A3B]">
+                    <span className="font-bold text-[#0D2C22]">
                       {shipping === 0 ? t.freeShipping : `₹${shipping}`}
                     </span>
                   </div>
-                  <div className="pt-3 border-t border-[#DDD0B5] flex justify-between font-heading text-lg font-bold text-[#2C4A3B]">
+                  <div className="pt-3 border-t border-[#D4AF37]/30 flex justify-between font-heading text-lg font-bold text-[#0D2C22]">
                     <span>{t.total}</span>
                     <span>₹{total}</span>
                   </div>
@@ -234,7 +240,7 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
 
                 <button
                   onClick={() => setIsCheckoutOpen(true)}
-                  className="w-full py-3.5 bg-[#D9A404] text-[#2C4A3B] rounded-xl font-heading font-bold text-base hover:bg-[#edb508] transition-all shadow-lg active:scale-95 mt-2"
+                  className="w-full py-3.5 bg-[#0D2C22] text-[#D4AF37] border border-[#D4AF37]/40 rounded-xl font-heading font-bold text-base hover:bg-[#184234] transition-all shadow-lg active:scale-95 mt-2"
                 >
                   ⚡ {t.checkout}
                 </button>
@@ -245,113 +251,96 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
 
         {/* Razorpay Checkout Modal */}
         {isCheckoutOpen && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[#F4ECDC] border-4 border-[#2C4A3B] rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+          <div className="fixed inset-0 z-50 bg-[#071C15]/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-[#FDFBF7] border-4 border-[#D4AF37] rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative text-[#1A2421]">
               <button
                 onClick={() => setIsCheckoutOpen(false)}
-                className="absolute top-4 right-4 text-[#2C4A3B] font-bold text-lg hover:text-red-700"
+                className="absolute top-4 right-4 text-gray-500 hover:text-black font-bold text-lg"
               >
                 ✕
               </button>
 
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#2C4A3B] text-[#D9A404] flex items-center justify-center font-bold text-lg">
-                  💳
-                </div>
-                <div>
-                  <h3 className="font-heading text-xl font-bold text-[#2C4A3B]">
-                    Razorpay Gateway Checkout
-                  </h3>
-                  <p className="text-xs text-[#3F2A3D]/75">
-                    Secure guest checkout • No login required
-                  </p>
-                </div>
+              <div className="flex items-center space-x-2 text-[#C85A32] text-xs font-bold uppercase tracking-wider mb-2">
+                <span>🔒 Secure Checkout</span>
+                <span>•</span>
+                <span>Razorpay Gateway</span>
               </div>
 
-              <form onSubmit={handleCheckoutSubmit} className="space-y-4 text-xs">
+              <h2 className="font-heading text-2xl font-bold text-[#0D2C22] mb-1">
+                {t.customerDetails}
+              </h2>
+              <p className="text-xs text-[#1A2421]/70 mb-6">
+                Total Payable: <strong className="text-[#0D2C22] text-sm">₹{total}</strong>
+              </p>
+
+              <form onSubmit={handleCheckoutSubmit} className="space-y-4">
                 <div>
-                  <label className="block font-bold text-[#2C4A3B] mb-1">
-                    Full Name *
+                  <label className="block text-xs font-bold text-[#0D2C22] uppercase mb-1">
+                    {t.fullName} *
                   </label>
                   <input
                     type="text"
                     required
                     value={customerName}
                     onChange={e => setCustomerName(e.target.value)}
-                    placeholder="e.g. Ramesh Kumar"
-                    className="w-full bg-[#EFE6D0] border border-[#DDD0B5] rounded-lg p-2.5 text-sm"
+                    placeholder="e.g. Ramesh Kulkarni"
+                    className="w-full bg-[#F7F3EB] border border-[#D4AF37]/40 rounded-xl px-3.5 py-2 text-xs text-[#1A2421] focus:outline-none focus:border-[#D4AF37]"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-bold text-[#2C4A3B] mb-1">
-                      Email Address *
+                    <label className="block text-xs font-bold text-[#0D2C22] uppercase mb-1">
+                      {t.emailAddress} *
                     </label>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="ramesh@example.com"
-                      className="w-full bg-[#EFE6D0] border border-[#DDD0B5] rounded-lg p-2.5 text-sm"
+                      placeholder="ramesh@gmail.com"
+                      className="w-full bg-[#F7F3EB] border border-[#D4AF37]/40 rounded-xl px-3.5 py-2 text-xs text-[#1A2421] focus:outline-none focus:border-[#D4AF37]"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-[#2C4A3B] mb-1">
-                      Phone Number
+                    <label className="block text-xs font-bold text-[#0D2C22] uppercase mb-1">
+                      {t.phoneNumber}
                     </label>
                     <input
                       type="tel"
                       value={phone}
                       onChange={e => setPhone(e.target.value)}
                       placeholder="+91 9876543210"
-                      className="w-full bg-[#EFE6D0] border border-[#DDD0B5] rounded-lg p-2.5 text-sm"
+                      className="w-full bg-[#F7F3EB] border border-[#D4AF37]/40 rounded-xl px-3.5 py-2 text-xs text-[#1A2421] focus:outline-none focus:border-[#D4AF37]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-[#2C4A3B] mb-1">
-                    Delivery Address *
+                  <label className="block text-xs font-bold text-[#0D2C22] uppercase mb-1">
+                    {t.shippingAddress} *
                   </label>
                   <textarea
                     required
                     rows={2}
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    placeholder="Street, City, Pincode..."
-                    className="w-full bg-[#EFE6D0] border border-[#DDD0B5] rounded-lg p-2.5 text-sm"
-                  />
+                    placeholder="Street, Landmark, City, State, Pincode"
+                    className="w-full bg-[#F7F3EB] border border-[#D4AF37]/40 rounded-xl px-3.5 py-2 text-xs text-[#1A2421] focus:outline-none focus:border-[#D4AF37]"
+                  ></textarea>
                 </div>
 
-                <div className="bg-[#FFFDF9] p-3 rounded-lg border border-[#DDD0B5]">
-                  <label className="block font-bold text-[#A85C32] mb-0.5">
-                    Razorpay Key ID (Optional for Live API)
-                  </label>
-                  <input
-                    type="text"
-                    value={razorpayKey}
-                    onChange={e => setRazorpayKey(e.target.value)}
-                    placeholder="rzp_live_xxxxxxxx (Leave blank for Sandbox Mode)"
-                    className="w-full bg-[#EFE6D0] border border-[#DDD0B5] rounded p-2 text-xs font-mono"
-                  />
-                  <span className="text-[10px] text-[#3F2A3D]/70 block mt-1">
-                    Integrated with Razorpay API standard checkout payload.
-                  </span>
-                </div>
-
-                <div className="pt-2 flex justify-between items-center font-heading text-base font-bold text-[#2C4A3B] border-t border-[#DDD0B5]">
-                  <span>Total Payable:</span>
-                  <span>₹{total}</span>
+                <div className="p-3 bg-[#0D2C22] text-[#FDFBF7] rounded-xl text-xs space-y-1 border border-[#D4AF37]/40">
+                  <div className="font-bold text-[#D4AF37]">{t.paymentMethod}</div>
+                  <div className="text-[11px] text-[#FDFBF7]/80">{t.razorpaySim}</div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="w-full py-3 bg-[#2C4A3B] text-[#D9A404] rounded-xl font-heading font-bold text-sm hover:bg-[#1b2d23] shadow-lg transition-all"
+                  className="w-full py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#F5D77F] text-[#0D2C22] rounded-xl font-heading font-bold text-sm hover:shadow-xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
                 >
-                  {isProcessing ? "Connecting to Razorpay..." : `Pay ₹${total} via Razorpay`}
+                  {isProcessing ? t.processing : `${t.payNowBtn} (₹${total})`}
                 </button>
               </form>
             </div>
@@ -359,7 +348,7 @@ export default function Cart({ items, onUpdateQty, onRemove, onClearCart }: Cart
         )}
       </div>
 
-      <LeafDivider color="#2C4A3B" />
+      <LeafDivider color="#0D2C22" />
     </div>
   );
 }
