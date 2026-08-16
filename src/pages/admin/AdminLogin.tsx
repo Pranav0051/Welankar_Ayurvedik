@@ -28,7 +28,7 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
             ⚙️
           </div>
           <h1 className="font-heading text-2xl font-bold text-[#2C4A3B]">
-            Welankar Ayurvedik Admin Portal
+            Velankar Ayurvedik Admin Portal
           </h1>
           <p className="text-xs text-[#3F2A3D]/75 mt-1">
             Manage products, bulk CSV imports, orders & chatbot knowledge base

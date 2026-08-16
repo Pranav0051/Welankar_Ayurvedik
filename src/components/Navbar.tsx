@@ -48,7 +48,7 @@ export default function Navbar({ cartItems }: NavbarProps) {
           </div>
           <div>
             <span className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-[#FDFBF7] block group-hover:text-[#D4AF37] transition-colors leading-none">
-              Welankar Ayurvedik
+              Velankar Ayurvedik
             </span>
             <span className="font-accent text-xs text-[#D4AF37] tracking-widest block mt-0.5">
               {t.subtitle}

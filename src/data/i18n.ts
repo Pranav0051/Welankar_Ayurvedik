@@ -472,7 +472,7 @@ export const translations: Record<Language, Translations> = {
       whatsappLabel: "WhatsApp:",
       websiteLabel: "Website:",
       pharmacyBadge: "✓ All Major Pharmacies & Online",
-      copyright: "© 2026 Dr. Velankar's The Herbal Shopee Pvt. Ltd. · Welankar Ayurvedik, Sangli · All Rights Reserved.",
+      copyright: "© 2026 Dr. Velankar's The Herbal Shopee Pvt. Ltd. · Velankar Ayurvedik, Sangli · All Rights Reserved.",
     },
   },
   HI: {

@@ -42,7 +42,7 @@ export default function AdminLayout() {
             </div>
             <div>
               <h2 className="font-heading font-bold text-lg text-[#EFE6D0] leading-none">
-                Welankar Admin
+                Velankar Admin
               </h2>
               <span className="text-[10px] text-[#D9A404] font-mono">
                 System Control v2.4
